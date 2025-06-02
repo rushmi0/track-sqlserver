@@ -14,8 +14,8 @@ SELECT
     mdf.name,
     mdf.physical_name AS data_file,
     ldf.physical_name AS log_file,
-    CAST((mdf.size * 8.0) / 1024 AS DECIMAL(8, 2)) AS db_size,
-    CAST((ldf.size * 8.0) / 1024 AS DECIMAL(8, 2)) AS log_size
+    CAST((mdf.size * 8.0) / 1024 AS DECIMAL(8, 2)) AS db_size_mb,
+    CAST((ldf.size * 8.0) / 1024 AS DECIMAL(8, 2)) AS log_size_mb
 FROM
     (SELECT * FROM sys.master_files WHERE type_desc = 'ROWS') mdf
 JOIN

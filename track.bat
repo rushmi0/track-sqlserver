@@ -1,28 +1,24 @@
 @echo off
 
-
 set SERVER=localhost
 set USERNAME=sa
-set PASSWORD=Sql@Min123
+set PASSWORD=sqladmin
 set DATABASE=master
 
 
-for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyy-MM-dd"') do set OUTPUT=report_%%i.csv
+for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HH-mm-ss"') do set DATETIME=%%i
+
+set OUTPUT=report_%DATETIME%.csv
+set TEMPFILE=temp_%DATETIME%.csv
+
+echo database_id,name,data_file,log_file,db_size_mb,log_size_mb > %OUTPUT%
 
 
-sqlcmd -S %SERVER%,1433 -U %USERNAME% -P %PASSWORD% -d %DATABASE% --encrypt trustservercertificate -W -s "," -Q "SET NOCOUNT ON;
-SELECT
-    mdf.database_id,
-    mdf.name,
-    mdf.physical_name AS data_file,
-    ldf.physical_name AS log_file,
-    CAST((mdf.size * 8.0) / 1024 AS DECIMAL(8, 2)) AS db_size,
-    CAST((ldf.size * 8.0) / 1024 AS DECIMAL(8, 2)) AS log_size
-FROM
-    (SELECT * FROM sys.master_files WHERE type_desc = 'ROWS') mdf
-JOIN
-    (SELECT * FROM sys.master_files WHERE type_desc = 'LOG') ldf
-    ON mdf.database_id = ldf.database_id;" > %OUTPUT%
+sqlcmd -S %SERVER%,1433 -E -d %DATABASE% -C -W -s "," -h -1 -i query.sql -o %TEMPFILE%
+rem sqlcmd -S %SERVER%,1433 -U %USERNAME% -P %PASSWORD% -d %DATABASE% -C -W -s "," -i query.sql -o %OUTPUT%
 
+type %TEMPFILE% >> %OUTPUT%
+
+del %TEMPFILE%
 
 echo Output saved to: %OUTPUT%
