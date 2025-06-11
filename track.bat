@@ -2,14 +2,18 @@
 
 set SERVER=localhost
 set USERNAME=sa
-set PASSWORD=sqladmin
+set PASSWORD=sql@min123
 set DATABASE=master
+
+if not exist records (
+    mkdir records
+)
 
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HH-mm-ss"') do set DATETIME=%%i
 
-set OUTPUT=report_%DATETIME%.csv
-set TEMPFILE=temp_%DATETIME%.csv
+set OUTPUT=records\report_%DATETIME%.csv
+set TEMPFILE=records\temp_%DATETIME%.csv
 
 echo database_id,name,data_file,log_file,db_size_mb,log_size_mb > %OUTPUT%
 
